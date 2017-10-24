@@ -2,11 +2,13 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.lang.String;
+import java.util.Comparator;
 
 public class priority_algorithm{
 
 	public static void main(String[] args) {
-		
+	 	ArrayList processList = new ArrayList();
+
 	}
 }
 
@@ -22,13 +24,15 @@ class process
 	int currentProcessLength;
 	int pseudoArrivalTime;
 	int pseudoCPUBursts;
-	process(String pname, int arrival, int CPU)
+	int priority;
+	process(String pname, int arrival, int CPU, int priority)
 	{
 		arrivalTime = arrival;
 		CPUBursts = CPU;
 		processName = pname;
 		pseudoArrivalTime = arrival;
 		pseudoCPUBursts = CPU;
+		priority = priority;
 	}
 	int getArrivalTimes() 
 	{
@@ -108,3 +112,31 @@ class process
 		return pseudoCPUBursts;
 	}
 };
+
+class processCompare implements Comparator<process>{
+	public int compare(process p1, process p2){
+		if(p1.arrivalTime > p2.arrivalTime){
+			return 1;
+		}
+		else if (p1.arrivalTime < p2.arrivalTime) {
+			return -1;
+		}
+		else{
+			if(p1.priority > p2.priority){
+				return 1;
+			}
+			else if (p1.priority < p2.priority){
+				return -1;
+			}
+			else{
+				if(p1.pseudoArrivalTime > p2.pseudoArrivalTime){
+					return 1;
+				}
+				else if (p1.pseudoArrivalTime < p2.pseudoArrivalTime){
+					return -1;
+				}
+			}
+		}
+		return 0;
+	}
+}
