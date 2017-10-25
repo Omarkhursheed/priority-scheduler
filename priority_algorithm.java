@@ -29,26 +29,23 @@ public class priority_algorithm{
 			processList.add(p1);
 		}
 		System.out.println("Would you like to do non-preemptive (1) or preemptive (2) scheduling?");
-		if (scan.nextInt() == 1)
+		int choice = scan.nextInt();
+		if (choice == 1)
 		{
 			nonPreemptive(processList);
 		}
-		else if (scan.nextInt() == 2)
+		else if (choice == 2)
 		{
 			preemptive(processList);
 		}
 
 	}
+
 	public static void nonPreemptive(ArrayList<process> processList)
 	{
 		ArrayList<process> orderedProcessList = new ArrayList();
 		int currentTime = 0;
 		Collections.sort(processList, new processCompare());
-		System.out.println("SORT");
-		for(int i = 0; i < processList.size();i++)
-		{
-			System.out.println(processList.get(i).getProcessName());
-		}
 		int nextProcessIndex = 0;
 
 		currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
@@ -98,7 +95,9 @@ public class priority_algorithm{
 		System.out.println("Process Name \t Turnaround Time \t Waiting Time");
 		for(int i = 0; i < orderedProcessList.size(); i++)
 		{
-			System.out.println(orderedProcessList.get(i).getProcessName()+'\t'+orderedProcessList.get(i).getProcessStartTime()+'\t'+orderedProcessList.get(i).getProcessEndTime());
+			int wait = orderedProcessList.get(i).getProcessStartTime() - orderedProcessList.get(i).getPseudoArrivalTime();
+			int turn = orderedProcessList.get(i).getPseudoCPUBursts() + wait;
+			System.out.println(orderedProcessList.get(i).getProcessName()+'\t'+'\t'+turn+'\t'+'\t'+wait);
 		}
 		/*for(int i = 0; i < processList.size(); i++)
 
@@ -107,27 +106,26 @@ public class priority_algorithm{
 		}*/
 
 	}
-
 	public static void preemptive(ArrayList<process> processList)
 	{
 		//FileWriter f0 = new FileWriter("preanswers.txt");
+
 		ArrayList<process> orderedProcessList = new ArrayList();
 		int nextProcessIndex = 0;
+
 		int originalSize = processList.size();
-		System.out.println("SOmet");
 		Collections.sort(processList, new processCompare());
-		System.out.println("SOmet1");
 		nextProcessIndex = 0;
 		int currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
 		int forever = currentTime;
 		processList.get(nextProcessIndex).setProcessStartTime(processList.get(nextProcessIndex).getArrivalTimes());
 		processList.get(nextProcessIndex).decrementCPUBursts();
 		//f0.write(processList.get(nextProcessIndex).getProcessName()+','+currentTime+'\n');
-		System.out.println("SORT");
+		/*System.out.println("SORT");
 		for(int i = 0; i < processList.size();i++)
 		{
 			System.out.println(processList.get(i).getProcessName());
-		}
+		}*/
 		
 		currentTime++;
 		for (int i = 0; i < processList.size(); i++)
@@ -146,15 +144,14 @@ public class priority_algorithm{
 		while(orderedProcessList.size() != originalSize)
 		{
 			Collections.sort(processList, new processCompare());
-		System.out.println("SORT");
+		/*System.out.println("SORT");
 		for(int i = 0; i < processList.size();i++)
 		{
 			System.out.println(processList.get(i).getProcessName());
-		}
+		}*/
 			
 			
 			
-			printProcess(processList);
 			nextProcessIndex = 0;
 			if(processList.get(nextProcessIndex).getCPUBursts() == processList.get(nextProcessIndex).getPseudoCPUBursts())
 			{
@@ -187,18 +184,19 @@ public class priority_algorithm{
 				processList.remove(nextProcessIndex);
 			}
 		}
-
-	}
-
-	public static void printProcess(ArrayList<process> list)
-	{
-		System.out.println("SORT");
-		for(int i = 0; i < list.size(); i++)
+		System.out.println("Process Name \t Turnaround Time \t Waiting Time");
+		for(int i = 0; i < orderedProcessList.size(); i++)
 		{
-			System.out.println(list.get(i).getProcessName());
+			int wait = orderedProcessList.get(i).getProcessEndTime() - orderedProcessList.get(i).getPseudoCPUBursts() - orderedProcessList.get(i).getPseudoArrivalTime();
+			int turn = orderedProcessList.get(i).getProcessEndTime() - orderedProcessList.get(i).getPseudoArrivalTime();
+			System.out.println(orderedProcessList.get(i).getProcessName()+'\t'+'\t'+ turn+'\t'+'\t'+wait);
 		}
+
 	}
+
 }
+
+
 
 class process
 {
