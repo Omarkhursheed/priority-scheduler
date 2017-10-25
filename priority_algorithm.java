@@ -3,12 +3,200 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import java.lang.String;
 import java.util.Comparator;
+import java.util.Collections;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;  
 
 public class priority_algorithm{
 
 	public static void main(String[] args) {
-	 	ArrayList processList = new ArrayList();
+	 	ArrayList<process> processList = new ArrayList();
+	 	Scanner scan = new Scanner(System.in);
+		System.out.println("How many processes do you wish to enter?");
+		int numberOfProcesses = scan.nextInt();
+		for (int i = 0; i < numberOfProcesses; i++){
+			System.out.print("Enter Process name?");
+			String pName = scan.next();
+			System.out.println("Enter arrival time?");
+			int arrival = scan.nextInt();
+			System.out.println("Enter number of CPU Bursts");
+			int bursts = scan.nextInt();
+			System.out.println("Enter priority");
+			int prio = scan.nextInt();
+			process p1 = new  process(pName, arrival, bursts, prio);
+			processList.add(p1);
+		}
+		System.out.println("Would you like to do non-preemptive (1) or preemptive (2) scheduling?");
+		if (scan.nextInt() == 1)
+		{
+			nonPreemptive(processList);
+		}
+		else if (scan.nextInt() == 2)
+		{
+			preemptive(processList);
+		}
 
+	}
+	public static void nonPreemptive(ArrayList<process> processList)
+	{
+		ArrayList<process> orderedProcessList = new ArrayList();
+		int currentTime = 0;
+		Collections.sort(processList, new processCompare());
+		System.out.println("SORT");
+		for(int i = 0; i < processList.size();i++)
+		{
+			System.out.println(processList.get(i).getProcessName());
+		}
+		int nextProcessIndex = 0;
+
+		currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
+		int forever = currentTime;
+		int originalSize = processList.size();
+		processList.get(nextProcessIndex).setProcessStartTime(currentTime);
+		processList.get(nextProcessIndex).setProcessEndTime(currentTime+processList.get(nextProcessIndex).getCPUBursts());
+
+		
+		currentTime += processList.get(nextProcessIndex).getCPUBursts();
+		orderedProcessList.add(processList.get(nextProcessIndex));
+		for(int i = 0; i < processList.size(); i++)
+		{
+			int count = 0;
+			while(processList.get(i).getArrivalTimes() != forever && count != processList.get(nextProcessIndex).getCPUBursts())
+			{
+				processList.get(i).decrementArrivalTime();
+				count++;
+			}
+		}
+		processList.remove(nextProcessIndex);
+		while(orderedProcessList.size() != originalSize)
+		{
+			Collections.sort(processList, new processCompare());
+			nextProcessIndex = 0;
+			/////////////////////////////////////////
+			if(currentTime < processList.get(nextProcessIndex).getPseudoArrivalTime())
+			{
+				currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
+			}
+			processList.get(nextProcessIndex).setProcessStartTime(currentTime);
+			processList.get(nextProcessIndex).setProcessEndTime(currentTime+processList.get(nextProcessIndex).getCPUBursts());
+			currentTime+=processList.get(nextProcessIndex).getCPUBursts();
+			orderedProcessList.add(processList.get(nextProcessIndex));
+			for (int i = 0; i < processList.size(); i++)
+			{
+				int count = 0;
+				while(processList.get(i).getArrivalTimes() != forever && count != processList.get(nextProcessIndex).getCPUBursts())
+				{
+					processList.get(i).decrementArrivalTime();
+					count++;
+				}
+			}
+			processList.remove(nextProcessIndex);
+			
+		}
+		System.out.println("Process Name \t Turnaround Time \t Waiting Time");
+		for(int i = 0; i < orderedProcessList.size(); i++)
+		{
+			System.out.println(orderedProcessList.get(i).getProcessName()+'\t'+orderedProcessList.get(i).getProcessStartTime()+'\t'+orderedProcessList.get(i).getProcessEndTime());
+		}
+		/*for(int i = 0; i < processList.size(); i++)
+
+		{
+			System.out.println(processList.get(i).getProcessName());
+		}*/
+
+	}
+
+	public static void preemptive(ArrayList<process> processList)
+	{
+		//FileWriter f0 = new FileWriter("preanswers.txt");
+		ArrayList<process> orderedProcessList = new ArrayList();
+		int nextProcessIndex = 0;
+		int originalSize = processList.size();
+		System.out.println("SOmet");
+		Collections.sort(processList, new processCompare());
+		System.out.println("SOmet1");
+		nextProcessIndex = 0;
+		int currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
+		int forever = currentTime;
+		processList.get(nextProcessIndex).setProcessStartTime(processList.get(nextProcessIndex).getArrivalTimes());
+		processList.get(nextProcessIndex).decrementCPUBursts();
+		//f0.write(processList.get(nextProcessIndex).getProcessName()+','+currentTime+'\n');
+		System.out.println("SORT");
+		for(int i = 0; i < processList.size();i++)
+		{
+			System.out.println(processList.get(i).getProcessName());
+		}
+		
+		currentTime++;
+		for (int i = 0; i < processList.size(); i++)
+		{
+			if(processList.get(i).getArrivalTimes() != forever)
+			{
+				processList.get(i).decrementArrivalTime();
+			}
+		}
+		if(processList.get(nextProcessIndex).getCPUBursts() == 0)
+		{
+			processList.get(nextProcessIndex).setProcessEndTime(currentTime);
+			orderedProcessList.add(processList.get(nextProcessIndex));
+			processList.remove(nextProcessIndex);
+		}
+		while(orderedProcessList.size() != originalSize)
+		{
+			Collections.sort(processList, new processCompare());
+		System.out.println("SORT");
+		for(int i = 0; i < processList.size();i++)
+		{
+			System.out.println(processList.get(i).getProcessName());
+		}
+			
+			
+			
+			printProcess(processList);
+			nextProcessIndex = 0;
+			if(processList.get(nextProcessIndex).getCPUBursts() == processList.get(nextProcessIndex).getPseudoCPUBursts())
+			{
+				if(currentTime < processList.get(nextProcessIndex).getPseudoArrivalTime())
+				{
+					int putfile = processList.get(nextProcessIndex).getPseudoArrivalTime()-currentTime;
+					for (int i = 0; i < putfile; i++)
+					{
+						String x = String.valueOf(currentTime+i);
+						//f0.write("I,"+x);
+					}
+					currentTime = processList.get(nextProcessIndex).getPseudoArrivalTime();
+				}
+				processList.get(nextProcessIndex).setProcessStartTime(currentTime);
+			}
+			//f0.write(processList.get(nextProcessIndex).getProcessName()+','+String.valueOf(currentTime));
+			processList.get(nextProcessIndex).decrementCPUBursts();
+			currentTime++;
+			for(int i = 0; i < processList.size(); i++)
+			{
+				if(processList.get(i).getArrivalTimes() != forever)
+				{
+					processList.get(i).decrementArrivalTime();
+				}
+			}
+			if(processList.get(nextProcessIndex).getCPUBursts()==0)
+			{
+				processList.get(nextProcessIndex).setProcessEndTime(currentTime);
+				orderedProcessList.add(processList.get(nextProcessIndex));
+				processList.remove(nextProcessIndex);
+			}
+		}
+
+	}
+
+	public static void printProcess(ArrayList<process> list)
+	{
+		System.out.println("SORT");
+		for(int i = 0; i < list.size(); i++)
+		{
+			System.out.println(list.get(i).getProcessName());
+		}
 	}
 }
 
@@ -16,7 +204,7 @@ class process
 {
 
 	int arrivalTime;
-	int CPUBursts;
+	int bursts;
 	String processName;
 	int processStartTime;
 	int processEndTime;
@@ -25,14 +213,14 @@ class process
 	int pseudoArrivalTime;
 	int pseudoCPUBursts;
 	int priority;
-	process(String pname, int arrival, int CPU, int priority)
+	process(String pname, int arrival, int cpubursts, int priorityentry)
 	{
 		arrivalTime = arrival;
-		CPUBursts = CPU;
+		bursts = cpubursts;
 		processName = pname;
 		pseudoArrivalTime = arrival;
-		pseudoCPUBursts = CPU;
-		priority = priority;
+		pseudoCPUBursts = cpubursts;
+		priority = priorityentry;
 	}
 	int getArrivalTimes() 
 	{
@@ -40,7 +228,7 @@ class process
 	}
 	int getCPUBursts() 
 	{
-		return CPUBursts;	
+		return bursts;	
 	}
 	String getProcessName() 
 	{
@@ -90,12 +278,12 @@ class process
 	}
 	int setCPUBursts(int a)
 	{
-		CPUBursts = a;
+		bursts = a;
 		return 0;
 	}
 	int decrementCPUBursts()
 	{
-		CPUBursts--;
+		bursts--;
 		return 0;
 	}
 	int decrementArrivalTime()
@@ -115,26 +303,23 @@ class process
 
 class processCompare implements Comparator<process>{
 	public int compare(process p1, process p2){
-		if(p1.arrivalTime > p2.arrivalTime){
+		if(p1.arrivalTime > p2.arrivalTime)
+		{
 			return 1;
 		}
-		else if (p1.arrivalTime < p2.arrivalTime) {
+		else if (p1.arrivalTime < p2.arrivalTime)
+		{
 			return -1;
 		}
-		else{
-			if(p1.priority > p2.priority){
+		else
+		{
+			if(p1.priority > p2.priority)
+			{
 				return 1;
 			}
-			else if (p1.priority < p2.priority){
+			else if (p1.priority < p2.priority)
+			{
 				return -1;
-			}
-			else{
-				if(p1.pseudoArrivalTime > p2.pseudoArrivalTime){
-					return 1;
-				}
-				else if (p1.pseudoArrivalTime < p2.pseudoArrivalTime){
-					return -1;
-				}
 			}
 		}
 		return 0;
