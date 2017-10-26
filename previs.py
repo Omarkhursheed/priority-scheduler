@@ -21,26 +21,68 @@ x = len(content)
 i = 0
 prevProcessName = content[0].split(',')[0]
 originTime1 = content[0].split(',')[1]
+
 while(i < x):
 	if(content[i].split(',')[0] == prevProcessName):
 		rectLength+=1
 		if(i == x-1):
-			rectLength-=1
 			p = ax1.add_patch(patches.Rectangle(
 			(5+rectcorner,12),
-			rectLength,
+			rectLength*2,
 			2,
 			fill = False))
 			left = 5+rectcorner
-			width = rectLength
+			width = rectLength*2
 			bottom = 12
 			height = 2
 			right = left + width
 			ax1.text((left+right)/2,13,prevProcessName,horizontalalignment='center',verticalalignment='center')
 			ax1.text(left,11,originTime1,horizontalalignment='center',verticalalignment='center')	
 			rectcorner+=rectLength
-			ax1.text(right,11,content[i].split(',')[1],horizontalalignment='center',verticalalignment='center')	
+			ax1.text(right,11,int(content[i].split(',')[1])+rectLength-1,horizontalalignment='center',verticalalignment='center')	
 			
+	else:
+		p = ax1.add_patch(patches.Rectangle(
+			(5+rectcorner,12),
+			2*rectLength,
+			2,
+			fill = False))
+		left = 5+rectcorner
+		width = 2*rectLength
+		bottom = 12
+		height = 2
+		right = left + width
+		ax1.text((left+right)/2,13,prevProcessName,horizontalalignment='center',verticalalignment='center')
+		ax1.text(left,11,originTime1,horizontalalignment='center',verticalalignment='center')
+
+		rectcorner+=2*rectLength
+		rectLength = 1
+		prevProcessName = content[i].split(',')[0]	
+		originTime1 = content[i].split(',')[1]
+	i+=1
+
+
+"""
+while (i < x):
+	if(content[i].split(',')[0] == prevProcessName):
+		rectLength += 1
+		if(i == x-1):
+			p = ax1.add_patch(patches.Rectangle(
+			(5+rectcorner,12),
+			rectLength,
+			2,
+			fill = False))
+		left = 5+rectcorner
+		width = rectLength
+		bottom = 12
+		height = 2
+		right = left + width
+		y = str(int(originTime1)+int(rectLength))
+		ax1.text((left+right)/2,13,prevProcessName,horizontalalignment='center',verticalalignment='center')
+		ax1.text(left,11,originTime1,horizontalalignment='center',verticalalignment='center')
+		ax1.text(right,11,y,horizontalalignment='center',verticalalignment='center')
+		
+
 	else:
 		p = ax1.add_patch(patches.Rectangle(
 			(5+rectcorner,12),
@@ -54,14 +96,15 @@ while(i < x):
 		right = left + width
 		ax1.text((left+right)/2,13,prevProcessName,horizontalalignment='center',verticalalignment='center')
 		ax1.text(left,11,originTime1,horizontalalignment='center',verticalalignment='center')
-
+		if(i == x -1 ):
+			ax1.text(right,11,originTime1+rectLength,horizontalalignment='center',verticalalignment='center')
+		
 		rectcorner+=rectLength
-		rectLength = 1
-		prevProcessName = content[i].split(',')[0]	
+		rectLength =1
+		prevProcessName = content[i].split(',')[0]
 		originTime1 = content[i].split(',')[1]
 	i+=1
-
-
+"""
 """print(content[0].split(',')[0])
 prevProcessName = content[0].split(',')[0]
 x = len(content)
